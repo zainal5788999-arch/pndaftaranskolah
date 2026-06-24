@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMANTAP - Portal Pendaftaran Siswa Baru</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        /* ==========================================================================
+           1. VARIABLES & BASE STYLES
+           ========================================================================== */
+        :root {
+            /* Dark Mode (Default) Blue Neon & Glassmorphism Theme */
+            --bg-primary: #0a1128;
+            --bg-secondary: #101f42;
+            --accent-neon: #00f0ff;
+            --accent-gradient: linear-gradient(135deg, #00f0ff 0%, #0072ff 100%);
+            --text-main: #ffffff;
+            --text-muted: #8fa0dd;
+            --glass-bg: rgba(16, 31, 66, 0.6);
+            --glass-border: rgba(0, 240, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
+            --card-hover: rgba(0, 240, 255, 0.05);
+            --font-family: 'Poppins', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        [data-theme="light"] {
+            /* Light Mode Theme - Tetap Elegan & Premium */
+            --bg-primary: #f4f7fc;
+            --bg-secondary: #ffffff;
+            --accent-neon: #0055ff;
+            --accent-gradient: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+            --text-main: #0a1128;
+            --text-muted: #506187;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(0, 85, 255, 0.15);
+            --glass-shadow: rgba(0, 0, 0, 0.08);
+            --card-hover: rgba(0, 85, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Particles Background Container */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Utility Components */
+        .section-padding {
+            padding: 100px 8% 80px 8%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+        }
+
+        .section-title span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Glassmorphism Card Style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-neon);
+            box-shadow: 0 12px 40px 0 rgba(0, 240, 255, 0.15);
+            background: var(--card-hover);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--accent-neon);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================================================
+           2. LOADING SCREEN
+           ========================================================================== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a1128;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(0, 240, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-neon);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        #loader h2 {
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==========================================================================
+           3. NAVBAR
+           ========================================================================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            padding: 15px 8%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px var(--glass-shadow);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--accent-gradient);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-neon);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Dark/Light Toggle Button */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--accent-neon);
+            transform: scale(1.1);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* ==========================================================================
+           4. HERO SECTION
+           ========================================================================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 8%;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at 80% 20%, rgba(0, 114, 255, 0.15) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 650px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            line-height: 1.6;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+            animation: fadeInUp 1.4s ease;
+        }
+
+        /* Floating Vector / Parallax Design Shape */
+        .hero-visual {
+            position: absolute;
+            right: 5%;
+            width: 450px;
+            height: 450px;
+            background: var(--accent-gradient);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            filter: blur(40px);
+            opacity: 0.25;
+            animation: morphing 10s infinite alternate, floating 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes morphing {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%; }
+        }
+
+        /* ==========================================================================
+           5. COUNTDOWN SECTION
+           ========================================================================== */
+        .countdown-container {
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+            padding: 0 8%;
+        }
+
+        .countdown-wrapper {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .countdown-wrapper h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-neon);
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .time-box {
+            min-width: 90px;
+        }
+
+        .time-box span:first-child {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .time-box span:last-child {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ==========================================================================
+           6. TENTANG SEKOLAH & STATISTIK
+           ========================================================================== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.2s fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-text h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--accent-neon);
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .vision-mission {
+            margin-top: 30px;
+        }
+
+        .vm-box {
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .vm-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vm-box h4 i { color: var(--accent-neon); }
+
+        /* Stats Grid Inside About */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .stat-counter {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ==========================================================================
+           7. PROGRAM UNGGULAN
+           ========================================================================== */
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .program-card {
+            padding: 40px 30px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .program-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .program-card:hover::before { opacity: 1; }
+
+        .program-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: rgba(0, 240, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--accent-neon);
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .program-card:hover .program-icon {
+            background: var(--accent-gradient);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .program-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .program-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           8. ALUR PENDAFTARAN
+           ========================================================================== */
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background: var(--glass-border);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) { left: 0; text-align: right; }
+        .timeline-item:nth-child(even) { left: 50%; text-align: left; }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background: var(--accent-neon);
+            border-radius: 50%;
+            top: 25px;
+            z-index: 1;
+            box-shadow: 0 0 15px var(--accent-neon);
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot { left: -10px; }
+
+        .timeline-content {
+            padding: 25px;
+            position: relative;
+        }
+
+        .timeline-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: var(--accent-neon);
+        }
+
+        .timeline-content p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        /* ==========================================================================
+           9. FORMULIR PENDAFTARAN
+           ========================================================================== */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            background: var(--glass-border);
+            height: 4px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            background: var(--accent-gradient);
+            height: 4px;
+            width: 0%;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .step-circle.active {
+            border-color: var(--accent-neon);
+            color: var(--accent-neon);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .step-circle.completed {
+            background: var(--accent-neon);
+            border-color: var(--accent-neon);
+            color: #0a1128;
+        }
+
+        /* Form Multi-steps architecture */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        /* Standard Dropdown Styling Fixes for Light/Dark Context */
+        .form-group select option {
+            background: var(--bg-secondary);
+            color: var(--text-main);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-neon);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        /* Upload File Preview Areas */
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed var(--glass-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--accent-neon);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-box {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow: hidden;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .preview-box img {
+            width: auto;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .form-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        /* Custom Modal Box for Success Message */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 17, 40, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            padding: 40px;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .modal-content i {
+            font-size: 4rem;
+            color: #00ff66;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* ==========================================================================
+           10. FASILITAS SEKOLAH
+           ========================================================================== */
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .facility-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Placeholder background premium modern geometric pattern using CSS */
+        .facility-img {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #101f42, #0a1128);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .facility-img::after {
+            content: '\f19c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 4rem;
+            color: rgba(0, 240, 255, 0.1);
+        }
+
+        .facility-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px;
+            background: linear-gradient(transparent, rgba(10, 17, 40, 0.95));
+            transition: var(--transition);
+        }
+
+        .facility-card:hover .facility-overlay {
+            padding-bottom: 40px;
+        }
+
+        .facility-overlay h3 {
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .facility-overlay p {
+            color: var(--accent-neon);
+            font-size: 0.88rem;
+        }
+
+        /* ==========================================================================
+           11. TESTIMONI ALUMNI (Slider Otomatis)
+           ========================================================================== */
+        .testimonial-slider {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .testimonial-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            height: 100%;
+        }
+
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .testi-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .testimonial-slide p {
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        .testimonial-slide h4 {
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .testimonial-slide span {
+            font-size: 0.85rem;
+            color: var(--accent-neon);
+        }
+
+        /* ==========================================================================
+           12. FAQ (Accordion)
+           ========================================================================== */
+        .faq-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .faq-item {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .faq-header {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .faq-header i {
+            transition: var(--transition);
+            color: var(--accent-neon);
+        }
+
+        .faq-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+            padding: 0 25px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-body {
+            max-height: 300px;
+            padding: 0 25px 20px 25px;
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+        }
+
+        .faq-item.active .faq-header i {
+            transform: rotate(180deg);
+        }
+
+        /* ==========================================================================
+           13. KONTAK & PETA
+           ========================================================================== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-box {
+            padding: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .contact-box i {
+            font-size: 1.5rem;
+            color: var(--accent-neon);
+            margin-top: 3px;
+        }
+
+        .contact-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .contact-box p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .map-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            height: 100%;
+            min-height: 350px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .map-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ==========================================================================
+           14. FOOTER
+           ========================================================================== */
+        footer {
+            background: #060b1a;
+            padding: 70px 8% 30px 8%;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        [data-theme="light"] footer {
+            background: #eef2f9;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-about h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .footer-about h2 span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-about p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+        }
+
+        .social-links a:hover {
+            background: var(--accent-gradient);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-3px);
+        }
+
+        .footer-links h4 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .footer-links h4::after {
+            content: '';
+            position: absolute;
+            width: 35px;
+            height: 2px;
+            background: var(--accent-neon);
+            bottom: -8px;
+            left: 0;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links ul a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: var(--transition);
+        }
+
+        .footer-links ul a:hover {
+            color: var(--accent-neon);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           15. SCROLL TO TOP BUTTON
+           ========================================================================== */
+        #scrollTop {
+            position: fixed;
+            bottom: 30px;
+            right: -60px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            z-index: 99;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+            transition: var(--transition);
+        }
+
+        #scrollTop.show { right: 30px; }
+        #scrollTop:hover { transform: translateY(-3px); }
+
+        /* ==========================================================================
+           16. ANIMATIONS & RESPONSIVE DESIGN KEYFRAMES
+           ========================================================================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .about-grid, .program-grid, .facility-grid, .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero h1 { font-size: 3rem; }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                height: 100vh;
+                background: var(--bg-secondary);
+                flex-direction: column;
+                justify-content: center;
+                transition: 0.5s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            }
+            .nav-links.active { right: 0; }
+            .hero { flex-direction: column; text-align: center; justify-content: center; padding-top: 100px; }
+            .hero-content { max-width: 100%; }
+            .hero-btns { justify-content: center; }
+            .hero-visual { display: none; }
+            .about-grid, .program-grid, .facility-grid, .contact-grid, .footer-grid { grid-template-columns: 1fr; }
+            .timeline::after { left: 20px; }
+            .timeline-item { width: 100%; left: 0 !important; text-align: left !important; padding-left: 45px; }
+            .timeline-dot { left: 10px !important; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+            .form-container { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <h2>SMANTAP PORTAL</h2>
+    </div>
+
+    <canvas id="particles-js"></canvas>
+
+    <nav class="navbar">
+        <a href="#" class="logo"><i class="fa-solid fa-graduation-cap"></i> SMAN<span>TAP</span></a>
+        <ul class="nav-links">
+            <li><a href="#beranda" class="active">Beranda</a></li>
+            <li><a href="#tentang">Tentang Sekolah</a></li>
+            <li><a href="#program">Program</a></li>
+            <li><a href="#alur">Alur</a></li>
+            <li><a href="#fasilitas">Fasilitas</a></li>
+            <li><a href="#kontak">Kontak</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeBtn"><i class="fa-solid fa-moon"></i></button>
+            <a href="#pendaftaran" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem;">Daftar Sekarang</a>
+            <div class="menu-toggle" id="mobileMenu"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <section class="hero" id="beranda">
+        <div class="hero-content">
+            <h1 data-aos="fade-right">Masa Depan Gemilang Dimulai di SMAN<span>TAP</span></h1>
+            <p data-aos="fade-right" data-aos-delay="200">Mewujudkan Generasi Cerdas, Berkarakter Luhur, Unggul Finansial dan Berprestasi di Era Digital Terpadu.</p>
+            <div class="hero-btns" data-aos="fade-right" data-aos-delay="400">
+                <a href="#pendaftaran" class="btn btn-primary">Daftar Sekarang <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#tentang" class="btn btn-secondary">Lihat Informasi</a>
+            </div>
+        </div>
+        <div class="hero-visual"></div>
+    </section>
+
+    <div class="countdown-container">
+        <div class="countdown-wrapper glass-card" data-aos="zoom-in">
+            <h3>Pendaftaran Angkatan Berakhir Dalam</h3>
+            <div class="timer">
+                <div class="time-box"><span id="days">00</span><span>Hari</span></div>
+                <div class="time-box"><span id="hours">00</span><span>Jam</span></div>
+                <div class="time-box"><span id="minutes">00</span><span>Menit</span></div>
+                <div class="time-box"><span id="seconds">00</span><span>Detik</span></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section-padding" id="tentang">
+        <h2 class="section-title" data-aos="fade-up">Tentang <span>Sekolah Kami</span></h2>
+        <div class="about-grid">
+            <div class="about-text" data-aos="fade-right">
+                <h3>Membangun Pemimpin Masa Depan</h3>
+                <p>SMA Negeri Terpadu Prestasi (SMANTAP) mengintegrasikan kurikulum nasional berkemajuan tinggi dengan sistem pembelajaran berbasis digital dan pembentukan karakter kepemimpinan transformatif.</p>
+                <div class="vision-mission">
+                    <div class="vm-box glass-card">
+                        <h4><i class="fa-solid fa-eye"></i> Visi</h4>
+                        <p>Menjadi pusat pendidikan terpadu kelas dunia yang melahirkan SDM cerdas global dan berwawasan lingkungan.</p>
+                    </div>
+                    <div class="vm-box glass-card">
+                        <h4><i class="fa-solid fa-bullseye"></i> Misi</h4>
+                        <p>Menyelenggarakan pembelajaran saintifik adaptif, memperkuat soft-skill, serta memfasilitasi riset teknologi terapan inovatif.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-grid" data-aos="fade-left">
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="stat-counter" data-target="1250">0</div>
+                    <p>Siswa Aktif</p>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <div class="stat-counter" data-target="85">0</div>
+                    <p>Guru Profesional</p>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-trophy"></i>
+                    <div class="stat-counter" data-target="340">0</div>
+                    <p>Prestasi Nasional</p>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-school"></i>
+                    <div class="stat-counter" data-target="42">0</div>
+                    <p>Fasilitas Utama</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" id="program" style="background: rgba(0,0,0,0.02);">
+        <h2 class="section-title" data-aos="fade-up">Program <span>Unggulan Eksklusif</span></h2>
+        <div class="program-grid">
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="program-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                <h3>Kelas Unggulan Digital</h3>
+                <p>Fokus penguasaan kecerdasan buatan, dasar rekayasa perangkat lunak, dan analisis data analitis terpadu.</p>
+            </div>
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="program-icon"><i class="fa-solid fa-microscope"></i></div>
+                <h3>Laboratorium Modern</h3>
+                <p>Eksplorasi penelitian empiris mendalam melalui dukungan alat laboratorium mutakhir bersertifikasi tinggi.</p>
+            </div>
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="program-icon"><i class="fa-solid fa-palette"></i></div>
+                <h3>Ekstrakurikuler Komplet</h3>
+                <p>Pengembangan minat olahraga, kesenian, robotika internasional, debat global, bela diri, hingga kedirgantaraan.</p>
+            </div>
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="program-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+                <h3>Pembelajaran Digital</h3>
+                <p>Akses tanpa batas modul ajar interaktif berbasis aplikasi cloud LMS terintegrasi kapan saja dari mana saja.</p>
+            </div>
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="program-icon"><i class="fa-solid fa-award"></i></div>
+                <h3>Prestasi Akademik</h3>
+                <p>Bimbingan intensif olimpiade sains internasional melahirkan alumni yang menembus jajaran kampus top dunia.</p>
+            </div>
+            <div class="program-card glass-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="program-icon"><i class="fa-solid fa-medal"></i></div>
+                <h3>Prestasi Non-Akademik</h3>
+                <p>Pendampingan atlet pelajar profesional berjenjang melahirkan rekor medali emas tingkat nasional.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" id="alur">
+        <h2 class="section-title" data-aos="fade-up">Alur <span>Pendaftaran Sistematis</span></h2>
+        <div class="timeline">
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card">
+                    <h3>1. Isi Formulir Online</h3>
+                    <p>Lengkapi biodata lengkap calon siswa secara seksama langsung pada portal resmi di bagian bawah.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card">
+                    <h3>2. Unggah Berkas Valid</h3>
+                    <p>Unggah pindaian berkas administratif utama seperti KK, Ijazah/SKL, dan Pas Foto dalam format dokumen digital.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card">
+                    <h3>3. Verifikasi Data Internal</h3>
+                    <p>Tim seleksi komite panitia akan meninjau kecocokan data dokumen dalam waktu maksimal 3 hari kerja.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card">
+                    <h3>4. Pengumuman Hasil</h3>
+                    <p>Status kelulusan seleksi berkas & akademis dapat langsung diakses melalui akun portal log masuk masing-masing siswa.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card">
+                    <h3>5. Registrasi Daftar Ulang</h3>
+                    <p>Bagi calon siswa yang dinyatakan lulus, wajib melakukan verifikasi fisik kelengkapan data lanjutan di sekolah.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" id="pendaftaran">
+        <h2 class="section-title" data-aos="fade-up">Formulir <span>Pendaftaran Online</span></h2>
+        <div class="form-container glass-card" data-aos="zoom-in">
+            
+            <div class="progress-container">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step-circle active" data-step="1">1</div>
+                <div class="step-circle" data-step="2">2</div>
+                <div class="step-circle" data-step="3">3</div>
+            </div>
+
+            <form id="regForm">
+                <div class="form-step active" data-step="1">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nama">Nama Lengkap *</label>
+                            <input type="text" id="nama" placeholder="Masukkan nama sesuai ijazah" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nisn">NISN *</label>
+                            <input type="number" id="nisn" placeholder="10 Digit nomor induk siswa" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tempat">Tempat Lahir</label>
+                            <input type="text" id="tempat" placeholder="Kota lahir">
+                        </div>
+                        <div class="form-group">
+                            <label for="tanggal">Tanggal Lahir *</label>
+                            <input type="date" id="tanggal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jk">Jenis Kelamin</label>
+                            <select id="jk">
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agama">Agama</label>
+                            <select id="agama">
+                                <option value="Islam">Islam</option>
+                                <option value="Kristen">Kristen</option>
+                                <option value="Katolik">Katolik</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Budha">Budha</option>
+                                <option value="Konghucu">Konghucu</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="alamat">Alamat Lengkap *</label>
+                            <textarea id="alamat" rows="3" placeholder="Nama jalan, RT/RW, Kecamatan, Kota/Kabupaten" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-nav">
+                        <div></div>
+                        <button type="button" class="btn btn-primary next-btn">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="form-step" data-step="2">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="asalSekolah">Asal Sekolah SMP/Mts *</label>
+                            <input type="text" id="asalSekolah" placeholder="Nama sekolah asal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hp">Nomor HP (WhatsApp) *</label>
+                            <input type="tel" id="hp" placeholder="Contoh: 0812345678" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="email">Alamat Email Aktif *</label>
+                            <input type="email" id="email" placeholder="contoh@gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ortu">Nama Orang Tua / Wali *</label>
+                            <input type="text" id="ortu" placeholder="Nama ayah/ibu/wali" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pekerjaan">Pekerjaan Orang Tua</label>
+                            <input type="text" id="pekerjaan" placeholder="Sektor bidang pekerjaan">
+                        </div>
+                    </div>
+                    <div class="form-nav">
+                        <button type="button" class="btn btn-secondary prev-btn"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary next-btn">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="form-step" data-step="3">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Pas Foto Resmi (3x4) *</label>
+                            <div class="file-upload-wrapper">
+                                <i class="fa-solid fa-image" style="font-size: 2rem; color: var(--accent-neon); margin-bottom: 10px;"></i>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">Pilih file foto JPG/PNG max 2MB</p>
+                                <input type="file" id="uploadFoto" accept="image/*" required>
+                                <div class="preview-box" id="previewFoto"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Scan Kartu Keluarga (KK) *</label>
+                            <div class="file-upload-wrapper">
+                                <i class="fa-solid fa-file-pdf" style="font-size: 2rem; color: var(--accent-neon); margin-bottom: 10px;"></i>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">Pilih berkas gambar atau PDF max 2MB</p>
+                                <input type="file" id="uploadKK" accept="image/*,application/pdf" required>
+                                <div class="preview-box" id="previewKK"></div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Scan Ijazah / Surat Keterangan Lulus (SKL) *</label>
+                            <div class="file-upload-wrapper">
+                                <i class="fa-solid fa-file-invoice" style="font-size: 2rem; color: var(--accent-neon); margin-bottom: 10px;"></i>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">Pilih berkas gambar atau PDF max 5MB</p>
+                                <input type="file" id="uploadIjazah" accept="image/*,application/pdf" required>
+                                <div class="preview-box" id="previewIjazah"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-nav">
+                        <button type="button" class="btn btn-secondary prev-btn"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                        <button type="submit" class="btn btn-primary">Kirim Form <i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="section-padding" id="fasilitas" style="background: rgba(0,0,0,0.02);">
+        <h2 class="section-title" data-aos="fade-up">Fasilitas <span>Modern Berstandar</span></h2>
+        <div class="facility-grid">
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="100">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Perpustakaan Digital</h3>
+                    <p>Ribuan koleksi e-book & jurnal sains internasional</p>
+                </div>
+            </div>
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Laboratorium Komputer</h3>
+                    <p>Dilengkapi PC berspesifikasi tinggi & jaringan gigabit</p>
+                </div>
+            </div>
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="300">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Laboratorium Riset MIPA</h3>
+                    <p>Ruang penelitian sains biologi-kimia mutakhir</p>
+                </div>
+            </div>
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="100">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Masjid Terpadu</h3>
+                    <p>Arsitektur agung penunjang pembinaan kerohanian siswa</p>
+                </div>
+            </div>
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Sport Center Indoor</h3>
+                    <p>Fasilitas lengkap basket, futsal, bulutangkis, senam</p>
+                </div>
+            </div>
+            <div class="facility-card" data-aos="zoom-in" data-aos-delay="300">
+                <div class="facility-img"></div>
+                <div class="facility-overlay">
+                    <h3>Ruang Kelas Futuristik</h3>
+                    <p>Pendingin ruangan, smartboard TV, & kursi ergonomis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <h2 class="section-title" data-aos="fade-up">Apa Kata <span>Alumni Sukses</span></h2>
+        <div class="testimonial-slider glass-card" data-aos="fade-up">
+            <div class="testimonial-track" id="testiTrack">
+                <div class="testimonial-slide">
+                    <div class="testi-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                    <p>"Belajar di SMANTAP membentuk pola pikir kritis computational saya sejak dini. Ekosistemnya sangat suportif mengantar saya meraih beasiswa kuliah penuh ke Kyoto University."</p>
+                    <h4>Zainal Arifin</h4>
+                    <span>Alumni Angkatan 2021 - Software Engineer Specialist</span>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testi-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                    <p>"Fasilitas laboratorium yang lengkap di SMANTAP membuat riset ilmiah bukan lagi hal yang menakutkan. Guru di sini mendampingi saya dengan penuh dedikasi tanpa lelah."</p>
+                    <h4>Annisa Rahma</h4>
+                    <span>Alumni Angkatan 2022 - Peneliti Mikrobiologi BRIN</span>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testi-avatar"><i class="fa-solid fa-user-ninja"></i></div>
+                    <p>"Kombinasi akademik ketat dan ekstrakurikuler dinamis mengasah karakter kepemimpinan saya dengan maksimal. Menjadi ketua OSIS di SMANTAP adalah titik balik hidup saya."</p>
+                    <h4>Dimas Anggara</h4>
+                    <span>Alumni Angkatan 2023 - Co-Founder Creative Tech Agency</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background: rgba(0,0,0,0.01);">
+        <h2 class="section-title" data-aos="fade-up">Pertanyaan <span>Sering Diajukan</span></h2>
+        <div class="faq-wrapper">
+            <div class="faq-item glass-card">
+                <div class="faq-header">Kapan batas penutupan pendaftaran online reguler? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-body">Pendaftaran siswa baru reguler gelombang pertama akan ditutup sesuai dengan hitungan mundur pendaftaran di atas, yaitu hingga kuota utama terpenuhi sepenuhnya oleh verifikasi berkas pusat.</div>
+            </div>
+            <div class="faq-item glass-card">
+                <div class="faq-header">Apa saja berkas fisik utama wajib yang dibawa saat daftar ulang? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-body">Calon siswa wajib melampirkan lembar asli cetak form pendaftaran sistem, fotokopi KK dilegalisir, SKL/Ijazah asli, pas foto berwarna terbaru, dan surat keterangan berbadan sehat dari dokter resmi.</div>
+            </div>
+            <div class="faq-item glass-card">
+                <div class="faq-header">Apakah terdapat program beasiswa potongan biaya pendidikan? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-body">Ya, SMANTAP menyediakan skema jalur beasiswa prestasi akademik & non-akademik berupa pembebasan iuran komite penuh bagi peraih juara minimal tingkat kota/provinsi.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" id="kontak">
+        <h2 class="section-title" data-aos="fade-up">Hubungi <span>Pusat Informasi</span></h2>
+        <div class="contact-grid">
+            <div class="contact-info" data-aos="fade-right">
+                <div class="contact-box glass-card">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <h4>Alamat Pusat</h4>
+                        <p>Jl. Pendidikan Terpadu No. 45, Kompleks Prestasi Utama, Jakarta Pusat, Indonesia</p>
+                    </div>
+                </div>
+                <div class="contact-box glass-card">
+                    <i class="fa-solid fa-phone"></i>
+                    <div>
+                        <h4>Hubungi Kami</h4>
+                        <p>Hotline: (021) 8877-2233<br>WhatsApp: +62 812-3456-7890</p>
+                    </div>
+                </div>
+                <div class="contact-box glass-card">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <h4>Surat Elektronik</h4>
+                        <p>info@smantap.sch.id<br>ppdb@smantap.sch.id</p>
+                    </div>
+                </div>
+            </div>
+            <div class="map-wrapper" data-aos="fade-left">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m12!1m3!1d3966.6663922119107!2d106.82496417572793!3d-6.175392360514165!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sMonumen%20Nasional!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h2>SMAN<span>TAP</span></h2>
+                <p>Institusi pendidikan menengah terpadu berkomitmen tinggi mencetak talenta unggul masa depan berskala global di era disrupsi digital.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Navigasi</h4>
+                <ul>
+                    <li><a href="#beranda">Beranda</a></li>
+                    <li><a href="#tentang">Tentang Kami</a></li>
+                    <li><a href="#program">Program Unggulan</a></li>
+                    <li><a href="#pendaftaran">Portal Registrasi</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Jam Operasional</h4>
+                <ul>
+                    <li><p style="color: var(--text-muted); font-size:0.92rem;">Senin - Jumat: 07.00 - 16.00 WIB</p></li>
+                    <li><p style="color: var(--text-muted); font-size:0.92rem;">Sabtu (Ekskul): 08.00 - 12.00 WIB</p></li>
+                    <li><p style="color: var(--text-muted); font-size:0.92rem;">Minggu & Hari Libur: Tutup Pelayanan</p></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright &copy; 2026 SMANTAP (Sekolah Menengah Atas Negeri Terpadu Prestasi). All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content glass-card">
+            <i class="fa-solid fa-circle-check"></i>
+            <h2 style="margin-bottom: 10px;">Pendaftaran Sukses!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem;">Data formulir registrasi Anda berhasil tersimpan. Sistem panitia pusat akan segera melakukan proses verifikasi data.</p>
+            <button class="btn btn-primary" id="closeModalBtn" style="width: 100%; justify-content: center;">Selesai</button>
+        </div>
+    </div>
+
+    <button id="scrollTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Inisialisasi Efek Animasi AOS Scroll
+        AOS.init({ duration: 1000, once: true });
+
+        /* ==========================================================================
+           A. LOADING SCREEN TIMEOUT UTILITY
+           ========================================================================== */
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }, 800);
+            initCounters();
+        });
+
+        /* ==========================================================================
+           B. INTERFACE BACKGROUND PARTICLES (NATIVE HTML5 CANVAS ENGINE)
+           ========================================================================== */
+        const canvas = document.getElementById('particles-js');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                // Warna mengikuti skema variabel CSS accent neon terdaftar
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-neon').trim();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < 65; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+
+        /* ==========================================================================
+           C. DARK MODE & LIGHT MODE SWITCH MANAGEMENT
+           ========================================================================== */
+        const themeBtn = document.getElementById('themeBtn');
+        const htmlElement = document.documentElement;
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                htmlElement.setAttribute('data-theme', 'light');
+                themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else {
+                htmlElement.setAttribute('data-theme', 'dark');
+                themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
+        });
+
+        /* ==========================================================================
+           D. NAVBAR ACTIONS & MOBILE RESPONSIVE TRIGGER
+           ========================================================================== */
+        const navbar = document.querySelector('.navbar');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navLinks = document.querySelector('.nav-links');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            // Sinkronisasi Active Link saat Scroll halaman
+            syncActiveNavLinks();
+        });
+
+        mobileMenu.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenu.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileMenu.innerHTML = '<i class="fa-solid fa-bars"></i>';
+            });
+        });
+
+        function syncActiveNavLinks() {
+            const sections = document.querySelectorAll('section');
+            let scrollPosition = window.scrollY + 150;
+
+            sections.forEach(section => {
+                if (scrollPosition >= section.offsetTop && scrollPosition < (section.offsetTop + section.offsetHeight)) {
+                    const id = section.getAttribute('id');
+                    document.querySelectorAll('.nav-links a').forEach(a => {
+                        a.classList.remove('active');
+                        if (a.getAttribute('href') === `#${id}`) {
+                            a.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        /* ==========================================================================
+           E. ACCORDION SYSTEM FOR FAQ COMPONENT
+           ========================================================================== */
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        /* ==========================================================================
+           F. RUNNING AUTOMATIC TESTIMONIAL SLIDER
+           ========================================================================== */
+        const testiTrack = document.getElementById('testiTrack');
+        let index = 0;
+
+        function runTestiSlider() {
+            index++;
+            if (index >= 3) index = 0;
+            testiTrack.style.transform = `translateX(-${index * 100}%)`;
+        }
+        setInterval(runTestiSlider, 5000);
+
+        /* ==========================================================================
+           G. INTERACTIVE COUNTER ANIMATION (RUNS ON VIEWPOINT SCROLL)
+           ========================================================================== */
+        function initCounters() {
+            const counters = document.querySelectorAll('.stat-counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const increment = target / 40;
+                let count = 0;
+
+                const updateCount = () => {
+                    count += increment;
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count) + "+";
+                        setTimeout(updateCount, 25);
+                    } else {
+                        counter.innerText = target + "+";
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        /* ==========================================================================
+           H. COUNDOWN TIMER TO TARGET PPDB SYSTEM CLOSING
+           ========================================================================== */
+        // Set target countdown tanggal 1 Agustus tahun 2026 mendatang
+        const targetDate = new Date("Aug 1, 2026 23:59:59").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference < 0) {
+                document.querySelector('.timer').innerHTML = "<h4>Pendaftaran Angkatan Resmi Ditutup</h4>";
+                return;
+            }
+
+            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+        }
+        setInterval(updateCountdown, 1000);
+
+        /* ==========================================================================
+           I. MULTI-STEP REGISTRATION FORM MANAGEMENT & VALIDATION
+           ========================================================================== */
+        const formSteps = document.querySelectorAll('.form-step');
+        const nextBtns = document.querySelectorAll('.next-btn');
+        const prevBtns = document.querySelectorAll('.prev-btn');
+        const progressLine = document.getElementById('progressLine');
+        const stepCircles = document.querySelectorAll('.step-circle');
+        const regForm = document.getElementById('regForm');
+        let currentFormStep = 1;
+
+        // Load data sementara jika tersimpan dari Local Storage sebelumnya
+        window.addEventListener('DOMContentLoaded', loadLocalStorageData);
+
+        nextBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (validateStepInputs(currentFormStep)) {
+                    saveCurrentStepToStorage();
+                    currentFormStep++;
+                    updateFormStepDisplay();
+                }
+            });
+        });
+
+        prevBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFormStep--;
+                updateFormStepDisplay();
+            });
+        });
+
+        function updateFormStepDisplay() {
+            formSteps.forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.getAttribute('data-step')) === currentFormStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update Circle Tracker UI
+            stepCircles.forEach((circle, i) => {
+                const stepNum = i + 1;
+                circle.classList.remove('active', 'completed');
+                if (stepNum < currentFormStep) circle.classList.add('completed');
+                else if (stepNum === currentFormStep) circle.classList.add('active');
+            });
+
+            // Update Connecting Progress Blue Line Width
+            const progressPercent = ((currentFormStep - 1) / (stepCircles.length - 1)) * 100;
+            progressLine.style.width = `${progressPercent}%`;
+        }
+
+        function validateStepInputs(stepNum) {
+            const activeStepEl = document.querySelector(`.form-step[data-step="${stepNum}"]`);
+            const inputs = activeStepEl.querySelectorAll('input[required], textarea[required], select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#ff3333';
+                } else {
+                    input.style.borderColor = 'var(--glass-border)';
+                }
+            });
+
+            // Validasi Khusus Panjang NISN
+            if (stepNum === 1) {
+                const nisnEl = document.getElementById('nisn');
+                if (nisnEl.value.length < 5) {
+                    nisnEl.style.borderColor = '#ff3333';
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+
+        /* ==========================================================================
+           J. FILE UPLOAD IMAGE PREVIEW HANDLING
+           ========================================================================== */
+        function setupFilePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                            preview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        preview.innerHTML = `<p style="font-size:0.8rem; color:var(--accent-neon);"><i class="fa-solid fa-file-lines"></i> ${file.name}</p>`;
+                        preview.style.display = 'block';
+                    }
+                }
+            });
+        }
+        setupFilePreview('uploadFoto', 'previewFoto');
+        setupFilePreview('uploadKK', 'previewKK');
+        setupFilePreview('uploadIjazah', 'previewIjazah');
+
+        /* ==========================================================================
+           K. LOCAL STORAGE SYSTEM FOR PERSISTENT DRAFT PRESERVATION
+           ========================================================================== */
+        function saveCurrentStepToStorage() {
+            localStorage.setItem('smantap_nama', document.getElementById('nama').value);
+            localStorage.setItem('smantap_nisn', document.getElementById('nisn').value);
+            localStorage.setItem('smantap_alamat', document.getElementById('alamat').value);
+            localStorage.setItem('smantap_asalSekolah', document.getElementById('asalSekolah').value);
+            localStorage.setItem('smantap_hp', document.getElementById('hp').value);
+            localStorage.setItem('smantap_email', document.getElementById('email').value);
+            localStorage.setItem('smantap_ortu', document.getElementById('ortu').value);
+        }
+
+        function loadLocalStorageData() {
+            if (localStorage.getItem('smantap_nama')) document.getElementById('nama').value = localStorage.getItem('smantap_nama');
+            if (localStorage.getItem('smantap_nisn')) document.getElementById('nisn').value = localStorage.getItem('smantap_nisn');
+            if (localStorage.getItem('smantap_alamat')) document.getElementById('alamat').value = localStorage.getItem('smantap_alamat');
+            if (localStorage.getItem('smantap_asalSekolah')) document.getElementById('asalSekolah').value = localStorage.getItem('smantap_asalSekolah');
+            if (localStorage.getItem('smantap_hp')) document.getElementById('hp').value = localStorage.getItem('smantap_hp');
+            if (localStorage.getItem('smantap_email')) document.getElementById('email').value = localStorage.getItem('smantap_email');
+            if (localStorage.getItem('smantap_ortu')) document.getElementById('ortu').value = localStorage.getItem('smantap_ortu');
+        }
+
+        /* ==========================================================================
+           L. SUBMIT FORM & MODAL ACTION BOX CONTROLLER
+           ========================================================================== */
+        const successModal = document.getElementById('successModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        regForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Tampilkan kotak sukses
+            successModal.classList.add('active');
+            // Bersihkan data draf penyimpanan local storage pasca sukses submit
+            localStorage.clear();
+            regForm.reset();
+            document.querySelectorAll('.preview-box').forEach(box => box.style.display = 'none');
+            currentFormStep = 1;
+            updateFormStepDisplay();
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            successModal.classList.remove('active');
+        });
+
+        /* ==========================================================================
+           M. SCROLL TO TOP MANAGEMENT CONTROL
+           ========================================================================== */
+        const scrollTopBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) scrollTopBtn.classList.add('show');
+            else scrollTopBtn.classList.remove('show');
+        });
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
